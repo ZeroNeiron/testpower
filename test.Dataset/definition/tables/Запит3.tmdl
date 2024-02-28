@@ -1,0 +1,46 @@
+table Запит3
+	lineageTag: eb8edfc9-2ba0-4fa4-92cc-8cc138096512
+
+	column period
+		dataType: dateTime
+		formatString: Short Date
+		sourceProviderType: date
+		lineageTag: 95bd9a8c-5867-4370-9a90-de6290a37914
+		summarizeBy: none
+		sourceColumn: period
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column full_name
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: a3dc3a01-ac12-4c24-9fec-c097dfeef767
+		summarizeBy: none
+		sourceColumn: full_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column total
+		dataType: double
+		formatString: 0.0
+		sourceProviderType: double
+		lineageTag: 587ec2c6-1dbf-4f37-9454-15247163d01b
+		summarizeBy: sum
+		sourceColumn: total
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Запит3 = m
+		mode: directQuery
+		source =
+				let
+				    Джерело = Value.NativeQuery(GoogleBigQuery.Database(){[Name="rsfo-306316"]}[Data], "SELECT DATE(period) AS period, #(lf)CONCAT(SPLIT(SPLIT(user, ',')[0], ' ')[1], ' ', SPLIT(user, ' ')[0]) AS full_name , #(lf)ROUND(total / 3600, 1) AS total#(lf)FROM `rsfo-306316.raw_data.timetracker_get_summary_by_period_zuok`#(lf)WHERE DATE(period) BETWEEN #(lf)DATE(DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 14 DAY), WEEK(MONDAY)))#(lf)AND DATE(DATE_ADD(DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), WEEK(MONDAY)), INTERVAL 6 DAY))", null, [EnableFolding=true])
+				in
+				    Джерело
+
+	annotation PBI_ResultType = Exception
+
+	annotation PBI_NavigationStepName = Навігація
+

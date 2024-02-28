@@ -1,0 +1,56 @@
+table Запит2
+	lineageTag: 3d9cece7-bf5f-4c2b-b2ed-a5148cae0473
+
+	column key
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 2dda579d-74b5-4e50-aff9-6c151538d371
+		summarizeBy: none
+		sourceColumn: key
+
+		annotation SummarizationSetBy = Automatic
+
+	column displayName
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 0b8e431e-418e-4647-bafe-3ea9dbe42910
+		summarizeBy: none
+		sourceColumn: displayName
+
+		annotation SummarizationSetBy = Automatic
+
+	column duedate
+		dataType: dateTime
+		formatString: Short Date
+		sourceProviderType: date
+		lineageTag: 9b1cf90f-d0ad-4f39-a610-3970e470d393
+		summarizeBy: none
+		sourceColumn: duedate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column timeoriginalestimate
+		dataType: double
+		sourceProviderType: double
+		lineageTag: a85babfd-c3a0-4aa9-bf0c-fd51f4c535d5
+		summarizeBy: sum
+		sourceColumn: timeoriginalestimate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Запит2 = m
+		mode: directQuery
+		source =
+				let
+				    Джерело = Value.NativeQuery(GoogleBigQuery.Database(){[Name="rsfo-306316"]}[Data], "SELECT key, fields.assignee.displayName, DATE(fields.duedate) AS duedate, ROUND(fields.timeoriginalestimate/3600, 1) as timeoriginalestimate,#(lf)FROM `rsfo-306316.raw_data.jira_v3_issues_zuok`#(lf)WHERE #(lf)fields.assignee.accountId IS NOT NULL#(lf)AND DATE(fields.duedate) #(lf)BETWEEN DATE(DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 14 DAY), WEEK(MONDAY)))#(lf)AND DATE(CURRENT_DATE())", null, [EnableFolding=true])
+				in
+				    Джерело
+
+	annotation PBI_ResultType = Exception
+
+	annotation PBI_NavigationStepName = Навігація
+

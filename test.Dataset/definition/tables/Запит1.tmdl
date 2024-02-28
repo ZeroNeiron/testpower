@@ -1,0 +1,71 @@
+table Запит1
+	lineageTag: 4d3b36a6-24ef-492e-adc9-9b85653c8cf9
+
+	measure timeByWeek = ```
+			
+			VAR t = TODAY() - (7 * 1)
+			VAR monday = (t - WEEKDAY(t, 2) + 1)
+			VAR sunday = monday + 6
+			RETURN
+			CALCULATE(
+			    SUM(
+			        'Запит1'[timeoriginalestimate]),
+			         FILTER('Запит1',
+			         'Запит1'[duedate] IN CALENDAR(
+			            monday, 
+			            sunday)))
+			```
+		lineageTag: 0add3f11-8795-4b53-948f-71784d055fdb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column key
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 0a30e580-a104-4e47-9d17-d9223ffe1152
+		summarizeBy: none
+		sourceColumn: key
+
+		annotation SummarizationSetBy = Automatic
+
+	column displayName
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: dbdd69b7-fafc-4f3b-ab48-7158e7004494
+		summarizeBy: none
+		sourceColumn: displayName
+
+		annotation SummarizationSetBy = Automatic
+
+	column duedate
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 8b2ce105-cfa5-46d9-934e-e2ac77a741ad
+		summarizeBy: none
+		sourceColumn: duedate
+
+		annotation SummarizationSetBy = Automatic
+
+	column timeoriginalestimate
+		dataType: double
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 6a867fe5-454f-41f2-aec0-20be04892f44
+		summarizeBy: sum
+		sourceColumn: timeoriginalestimate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Запит1 = m
+		mode: directQuery
+		source =
+				let
+				    Джерело = Value.NativeQuery(GoogleBigQuery.Database([BillingProject="rsfo-306316"]){[Name="rsfo-306316"]}[Data], "SELECT#(lf)  key,#(lf)  fields.assignee.displayName,#(lf)  fields.duedate,#(lf)  ROUND(fields.timeoriginalestimate/3600, 1) as timeoriginalestimate,#(lf)FROM#(lf)  `rsfo-306316.raw_data.jira_v3_issues_zuok`#(lf)WHERE#(lf)  fields.assignee.accountId IS NOT NULL", null, [EnableFolding=true])
+				in
+				    Джерело
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Навігація
+
